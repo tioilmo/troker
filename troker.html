@@ -240,6 +240,18 @@
         .card.rest {
             background-color: white; /* Branco para Rest */
         }
+        /* Estilo para as bandeiras de idioma */
+        .language-flags {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .language-flags img {
+            width: 30px;
+            height: 20px;
+            margin: 0 10px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -309,6 +321,10 @@
     <div class="score-screen">
         <h1 class="title">TROKER</h1>
         <h2 class="subtitle">RULES</h2>
+        <div class="language-flags">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/0/05/Flag_of_Brazil.svg" alt="Brazil Flag" onclick="showPortugueseRules()">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/a/ae/Flag_of_the_United_Kingdom.svg" alt="UK Flag" onclick="showEnglishRules()">
+        </div>
         <div class="game-controls">
             <div class="start-button">
                 <button onclick="startGameAndStay()">Shuffle</button>
@@ -326,12 +342,13 @@
         <div class="container" id="gameContainer">
             <!-- As cartas do jogador humano serão inseridas aqui -->
         </div>
-        <div class="description">
-            <p>Clique no botão SHUFFLE, para gerar uma carta Master e distribuir três cartas para o jogador! Esta é apenas uma simulação para você aprender a avaliar o valor de uma carta com base na carta Master!</p>
-            <p>Você pode apertar o botão SHUFFLE quantas vezes quiser antes de começar a jogar para entender bem qual o valor das cartas!</p>
-            <h3>Regras de Pontuação:</h3>
-            <p>Os pontos básicos das cartas são estes abaixo. Eles serão somados a outros pontos gerados pela relação que as cartas da mão de cada jogador tem com a carta Master.</p>
-            <p><strong>Pontos Básicos:</strong></p>
+        <div class="description" id="rulesPortuguese">
+            <h3>Regras do Jogo TROKER</h3>
+            <h4>Objetivo do Jogo</h4>
+            <p>O objetivo do jogo é obter a maior pontuação possível ao selecionar cartas que têm uma relação favorável com a carta Master.</p>
+            <h4>Cartas e Valores</h4>
+            <p>O jogo utiliza um baralho padrão de 52 cartas, com 4 naipes (Copas, Ouros, Paus e Espadas) e 13 valores (Ás, 2, 3, 4, 5, 6, 7, 8, 9, 10, Valete, Dama, Rei).</p>
+            <p>Cada carta tem um valor básico:</p>
             <ul>
                 <li>Ás (A): 14 pontos</li>
                 <li>Rei (K): 13 pontos</li>
@@ -347,37 +364,115 @@
                 <li>3: 3 pontos</li>
                 <li>2: 2 pontos</li>
             </ul>
-            <p>Com base na relação que as cartas tem com a carta Master, as cartas são classificadas nas seguintes categorias:</p>
+            <h4>Carta Master</h4>
+            <p>A cada rodada, uma carta Master é sorteada aleatoriamente do baralho.</p>
+            <p>A carta Master determina o valor das outras cartas na mão dos jogadores.</p>
+            <h4>Relação das Cartas com a Carta Master</h4>
+            <p>As cartas são classificadas em três categorias com base na sua relação com a carta Master:</p>
             <ul>
-                <li><strong>Premium:</strong> Se o valor da carta for igual ao valor da carta Master, a carta vale 100 pontos. Por exemplo, se a carta Master for um Ás de Copas (A♥) e você tiver um Ás de Ouros (A♦), a carta vale 100 pontos. Isto porque as cartas tem a mesma numeração, neste caso o Ás.</li>
-                <li><strong>Silver:</strong> Se o naipe da carta for igual ao naipe da carta Master, a carta vale 36 pontos mais o valor básico da carta. Por exemplo, se a carta Master for um Ás de Copas (A♥) e você tiver um Rei de Copas (K♥), a carta vale 36 + 13 = 49 pontos.</li>
-                <li><strong>Rest:</strong> Caso contrário, a carta vale 16 pontos mais o valor básico da carta. Por exemplo, se a carta Master for um Ás de Copas (A♥) e você tiver uma Dama de Paus (Q♠), a carta vale 16 + 12 = 28 pontos.</li>
+                <li><strong>Premium:</strong> Se o valor da carta for igual ao valor da carta Master, a carta vale 100 pontos.</li>
+                <li><strong>Silver:</strong> Se o naipe da carta for igual ao naipe da carta Master, a carta vale 36 pontos mais o valor básico da carta.</li>
+                <li><strong>Rest:</strong> Caso contrário, a carta vale 16 pontos mais o valor básico da carta.</li>
             </ul>
-            <h3>Dinâmica do Jogo:</h3>
-            <p>O jogo TROKER é dividido em várias telas, cada uma com uma função específica. Aqui está uma descrição simples de cada tela:</p>
-            <h4>Tela Inicial</h4>
-            <p>Na tela inicial, você pode escolher o número de jogadores (de 2 a 6) e iniciar o jogo clicando no botão "PLAY". Se quiser ver as regras de pontuação das cartas, clique em "RULES".</p>
-            <h4>Tela de Jogo</h4>
-            <p>Na tela de jogo, você verá suas cartas e a carta Master. O objetivo é selecionar suas cartas para obter a maior pontuação possível com base nas regras de pontuação. Assim que você selecionar uma carta, você poderá ver a carta dos outros jogadores e a pontuação de cada rodada. Você só verá as cartas do adversário após escolher as suas cartas.</p>
-            <p>A cada seleção de cartas o jogo vai destacar numa tabela com a cor verde a carta vencedora e logo abaixo os pontos obtidos por cada uma das três cartas quando forem reveladas.</p>
-            <h4>Tela de Placar (Scoreboard)</h4>
-            <p>A tela de placar mostra o desempenho de cada jogador em todas as rodadas. Você pode ver os pontos totais e os pontos obtidos em cada rodada, o que ajuda a acompanhar o progresso do jogo.</p>
-            <h3>Dicas e Estratégias:</h3>
-            <p>Aqui estão algumas dicas e estratégias para ajudar você a ter um melhor desempenho no jogo:</p>
-            <h4>Escolha de Cartas em Cada Show</h4>
-            <p>A escolha das cartas em cada Show é crucial para maximizar sua pontuação. Aqui estão algumas estratégias:</p>
+            <h4>Dinâmica do Jogo</h4>
+            <p>O jogo é dividido em várias telas, cada uma com uma função específica:</p>
             <ul>
-                <li><strong>Primeira Show:</strong> Tente vencer a primeira Show, pois ela oferece a maior pontuação (3 pontos). Se você tiver uma carta Premium ou Silver, use-a na primeira Show.</li>
-                <li><strong>Segunda Show:</strong> Se você não tiver uma carta Premium ou Silver para usar na primeira Show, guarde-a maior carta que tiver para a segunda Show (2 pontos). Tentar ganhar dois pontos é melhor do que sacrificar uma boa carta na primeira Show, pois os jogadores tendem a revelar suas melhores cartas na primeira Show.</li>
-                <li><strong>Terceira Show:</strong> Se suas cartas não forem muito boas, guarde algumas cartas de valor intermediário para a terceiro Show (1 ponto). Mesmo que você não ganhe as primeiras Shows, ganhar a terceira Show pode garantir que você obtenha pelo menos um ponto na rodada, e um ponto ao final do jogo pode definir o vencedor!</li>
+                <li><strong>Tela Inicial:</strong> Permite escolher o número de jogadores (de 2 a 6) e iniciar o jogo.</li>
+                <li><strong>Tela de Jogo:</strong> Mostra as cartas do jogador humano e a carta Master. O objetivo é selecionar cartas para obter a maior pontuação possível.</li>
+                <li><strong>Tela de Placar (Scoreboard):</strong> Mostra o desempenho de cada jogador em todas as rodadas.</li>
+                <li><strong>Tela de Pontuação Final:</strong> Exibe a pontuação final de cada jogador.</li>
             </ul>
-            <h4>Vantagem de Vencer as Primeiras Shows</h4>
-            <p>Vencer as primeiras Shows é vantajoso porque elas oferecem mais pontos. Tente sempre vencer a primeira Show, pois ela oferece 3 pontos. Se isso não for possível, foque na segunda Show, que oferece 2 pontos.</p>
-            <h4>Estratégia de Guardar Cartas</h4>
-            <p>Quando sua mão não for muito boa, considere guardar cartas para as segundas e terceiras Shows. Isso pode ajudar a garantir que você obtenha pelo menos um ou dois pontos na rodada, mesmo que não ganhe a primeira Show. Desta forma você se mantém vivo na competição.</p>
-            <p>O jogo tem dez rodadas e é perfeitamente possível se recuperar de um começo ruim e virar o jogo se você for um bom estrategista.</p>
-            <p>Divirta-se jogando TROKER, um jogo estratégico e inteligente!</p>
+            <h4>Seleção de Cartas</h4>
+            <p>A cada rodada, os jogadores selecionam cartas para competir em três "Shows":</p>
+            <ul>
+                <li><strong>Primeira Show:</strong> A primeira seleção de cartas, que oferece a maior pontuação (3 pontos).</li>
+                <li><strong>Segunda Show:</strong> A segunda seleção de cartas, que oferece 2 pontos.</li>
+                <li><strong>Terceira Show:</strong> A terceira seleção de cartas, que oferece 1 ponto.</li>
+            </ul>
+            <h4>Estratégias de Seleção de Cartas</h4>
+            <ul>
+                <li><strong>Primeira Show:</strong> Tente vencer a primeira Show, pois ela oferece a maior pontuação (3 pontos). Use uma carta Premium ou Silver, se possível.</li>
+                <li><strong>Segunda Show:</strong> Se não tiver uma carta Premium ou Silver para usar na primeira Show, guarde a maior carta que tiver para a segunda Show (2 pontos).</li>
+                <li><strong>Terceira Show:</strong> Se suas cartas não forem muito boas, guarde algumas cartas de valor intermediário para a terceira Show (1 ponto).</li>
+            </ul>
+            <h4>Pontuação e Placar</h4>
+            <p>A pontuação de cada jogador é calculada com base nas cartas selecionadas e na relação com a carta Master.</p>
+            <p>O placar mostra o desempenho de cada jogador em todas as rodadas, incluindo os pontos totais e os pontos obtidos em cada rodada.</p>
+            <h4>Dicas e Estratégias</h4>
+            <ul>
+                <li><strong>Vantagem de Vencer as Primeiras Shows:</strong> Vencer as primeiras Shows é vantajoso porque elas oferecem mais pontos. Tente sempre vencer a primeira Show, pois ela oferece 3 pontos.</li>
+                <li><strong>Estratégia de Guardar Cartas:</strong> Quando sua mão não for muito boa, considere guardar cartas para as segundas e terceiras Shows. Isso pode ajudar a garantir que você obtenha pelo menos um ou dois pontos na rodada, mesmo que não ganhe a primeira Show.</li>
+            </ul>
+            <h4>Duração do Jogo</h4>
+            <p>O jogo tem dez rodadas, e é possível se recuperar de um começo ruim e virar o jogo se você for um bom estrategista.</p>
+            <h4>Desenvolvimento</h4>
             <p>Este jogo foi desenvolvido por Tio Ilmo Productions! Todos os direitos são reservados e é expressamente proibida a cópia ou reprodução de parte ou da totalidade deste produto!</p>
+        </div>
+        <div class="description" id="rulesEnglish" style="display: none;">
+            <h3>Rules of the Game TROKER</h3>
+            <h4>Game Objective</h4>
+            <p>The objective of the game is to obtain the highest possible score by selecting cards that have a favorable relationship with the Master card.</p>
+            <h4>Cards and Values</h4>
+            <p>The game uses a standard deck of 52 cards, with 4 suits (Hearts, Diamonds, Clubs, and Spades) and 13 values (Ace, 2, 3, 4, 5, 6, 7, 8, 9, 10, Jack, Queen, King).</p>
+            <p>Each card has a basic value:</p>
+            <ul>
+                <li>Ace (A): 14 points</li>
+                <li>King (K): 13 points</li>
+                <li>Queen (Q): 12 points</li>
+                <li>Jack (J): 11 points</li>
+                <li>10: 10 points</li>
+                <li>9: 9 points</li>
+                <li>8: 8 points</li>
+                <li>7: 7 points</li>
+                <li>6: 6 points</li>
+                <li>5: 5 points</li>
+                <li>4: 4 points</li>
+                <li>3: 3 points</li>
+                <li>2: 2 points</li>
+            </ul>
+            <h4>Master Card</h4>
+            <p>In each round, a Master card is randomly drawn from the deck.</p>
+            <p>The Master card determines the value of the other cards in the players' hands.</p>
+            <h4>Relationship of Cards with the Master Card</h4>
+            <p>The cards are classified into three categories based on their relationship with the Master card:</p>
+            <ul>
+                <li><strong>Premium:</strong> If the value of the card is equal to the value of the Master card, the card is worth 100 points.</li>
+                <li><strong>Silver:</strong> If the suit of the card is equal to the suit of the Master card, the card is worth 36 points plus the basic value of the card.</li>
+                <li><strong>Rest:</strong> Otherwise, the card is worth 16 points plus the basic value of the card.</li>
+            </ul>
+            <h4>Game Dynamics</h4>
+            <p>The game is divided into several screens, each with a specific function:</p>
+            <ul>
+                <li><strong>Initial Screen:</strong> Allows you to choose the number of players (from 2 to 6) and start the game.</li>
+                <li><strong>Game Screen:</strong> Shows your cards and the Master card. The objective is to select cards to obtain the highest possible score.</li>
+                <li><strong>Scoreboard Screen:</strong> Shows the performance of each player in all rounds.</li>
+                <li><strong>Final Score Screen:</strong> Displays the final score of each player.</li>
+            </ul>
+            <h4>Card Selection</h4>
+            <p>In each round, players select cards to compete in three "Shows":</p>
+            <ul>
+                <li><strong>First Show:</strong> The first selection of cards, which offers the highest score (3 points).</li>
+                <li><strong>Second Show:</strong> The second selection of cards, which offers 2 points.</li>
+                <li><strong>Third Show:</strong> The third selection of cards, which offers 1 point.</li>
+            </ul>
+            <h4>Card Selection Strategies</h4>
+            <ul>
+                <li><strong>First Show:</strong> Try to win the first Show, as it offers the highest score (3 points). Use a Premium or Silver card, if possible.</li>
+                <li><strong>Second Show:</strong> If you don't have a Premium or Silver card to use in the first Show, save the highest card you have for the second Show (2 points).</li>
+                <li><strong>Third Show:</strong> If your cards are not very good, save some medium-value cards for the third Show (1 point).</li>
+            </ul>
+            <h4>Scoring and Scoreboard</h4>
+            <p>Each player's score is calculated based on the selected cards and their relationship with the Master card.</p>
+            <p>The scoreboard shows the performance of each player in all rounds, including total points and points obtained in each round.</p>
+            <h4>Tips and Strategies</h4>
+            <ul>
+                <li><strong>Advantage of Winning the First Shows:</strong> Winning the first Shows is advantageous because they offer more points. Always try to win the first Show, as it offers 3 points.</li>
+                <li><strong>Strategy of Saving Cards:</strong> When your hand is not very good, consider saving cards for the second and third Shows. This can help ensure that you obtain at least one or two points in the round, even if you don't win the first Show.</li>
+            </ul>
+            <h4>Game Duration</h4>
+            <p>The game has ten rounds, and it is possible to recover from a bad start and turn the game around if you are a good strategist.</p>
+            <h4>Development</h4>
+            <p>This game was developed by Tio Ilmo Productions! All rights are reserved, and it is expressly forbidden to copy or reproduce any part or the entirety of this product!</p>
         </div>
     </div>
 
@@ -1240,6 +1335,17 @@
             // Reseta o scoreboard
             scoreboard = {};
         }
+
+        function showPortugueseRules() {
+            document.getElementById('rulesPortuguese').style.display = 'block';
+            document.getElementById('rulesEnglish').style.display = 'none';
+        }
+
+        function showEnglishRules() {
+            document.getElementById('rulesPortuguese').style.display = 'none';
+            document.getElementById('rulesEnglish').style.display = 'block';
+        }
     </script>
 </body>
 </html>
+
