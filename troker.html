@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TROKER</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 10px;
+        }
+        .title {
+            font-family: 'Pacifico', cursive;
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+        .subtitle {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+        .container {
+            margin-top: 20px;
+        }
+        .player {
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #ddd; /* Linha suave para separar os jogadores */
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+        .player-name {
+            flex: 1;
+            text-align: left;
+            margin-right: 10px; /* Espaçamento entre o nome e as cartas */
+        }
+        .card-columns {
+            display: flex;
+            justify-content: flex-start; /* Alinha as cartas à esquerda */
+            flex-wrap: wrap;
+        }
+        .card {
+            border: 1px solid #000;
+            padding: 5px;
+            margin: 2px;
+            width: 40px;
+            height: 60px;
+            text-align: center;
+            background-color: #f0f0f0;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+        .card.selected {
+            background-color: yellow;
+        }
+        .card p {
+            margin: 0;
+            font-size: 1.4em; /* Reduzido em 30% */
+        }
+        .card.red p {
+            color: red;
+        }
+        .info-box {
+            flex: 1;
+            text-align: right;
+            margin-left: 10px; /* Espaçamento entre as cartas e a caixa de informações */
+            border: 1px solid #ddd;
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+        .master-card {
+            border: 1px solid #000;
+            padding: 2px;
+            margin: 0 10px;
+            width: 50px; /* Aumente o tamanho da carta se necessário */
+            height: 50px; /* Aumente o tamanho da carta se necessário */
+            text-align: center;
+            background-color: #f0f0f0;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5em; /* Aumente o tamanho da fonte */
+            line-height: 1; /* Ajuste o line-height para centralizar o texto */
+        }
+        .master-card.red p {
+            color: red;
+        }
+        .game-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .game-controls label, .game-controls select, .game-controls button {
+            margin: 0 5px;
+        }
+        .game-controls .start-button {
+            flex: 1;
+            text-align: center;
+        }
+        .card-value {
+            font-size: 1em; /* Fonte maior para o valor das cartas */
+            margin-top: 2px;
+        }
+        .start-screen, .play-screen, .score-screen, .scoreboard-screen, .final-score-screen {
+            display: none;
+        }
+        .start-screen.active, .play-screen.active, .score-screen.active, .scoreboard-screen.active, .final-score-screen.active {
+            display: block;
+        }
+        /* Estilo para os botões */
+        button {
+            padding: 20px 40px; /* Dobra o tamanho dos botões */
+            font-size: 1.2em; /* Aumenta o tamanho da fonte */
+            margin: 10px; /* Ajusta a margem para melhor espaçamento */
+        }
+        /* Estilo para a barra de seleção de número de jogadores */
+        .game-controls select {
+            font-size: 1.2em; /* Aumenta o tamanho da fonte */
+            padding: 10px; /* Aumenta o padding */
+        }
+        /* Estilo para a tabela */
+        #gameTable, #scoreboardTable, #pointsTable, #finalScoreTable {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        #gameTable th, #gameTable td, #scoreboardTable th, #scoreboardTable td, #pointsTable th, #pointsTable td, #finalScoreTable th, #finalScoreTable td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        #gameTable th, #scoreboardTable th, #pointsTable th, #finalScoreTable th {
+            background-color: #f2f2f2;
+        }
+        /* Estilo para a célula vencedora */
+        .winning-cell {
+            background-color: #90EE90; /* Verde claro */
+            color: black; /* Cor da fonte para as cartas vencedoras */
+        }
+        /* Estilo para a fonte vermelha das cartas de naipe copas e ouros */
+        .red-suit {
+            color: red;
+        }
+        /* Estilo para o contador de rodadas */
+        .round-counter {
+            font-size: 2em;
+            margin-top: 20px;
+        }
+        /* Estilo específico para a tabela da tela Scoreboard */
+        #scoreboardTable {
+            font-size: 0.6em; /* Reduz o tamanho da fonte em 40% */
+            width: 100%; /* Ajusta a largura da tabela para 100% */
+            margin: 0 auto; /* Centraliza a tabela */
+        }
+        #scoreboardTable th, #scoreboardTable td {
+            padding: 4px; /* Reduz o padding */
+        }
+        #scoreboardTable th:nth-child(1), #scoreboardTable td:nth-child(1) {
+            width: 10%; /* Reduz a largura da coluna Player */
+        }
+        #scoreboardTable th:nth-child(2), #scoreboardTable td:nth-child(2) {
+            width: 5%; /* Reduz a largura da coluna All */
+        }
+        #scoreboardTable th:nth-child(3), #scoreboardTable td:nth-child(3) {
+            width: 10%; /* Reduz a largura da coluna Show */
+        }
+        #scoreboardTable th:nth-child(4), #scoreboardTable th:nth-child(5), #scoreboardTable th:nth-child(6),
+        #scoreboardTable th:nth-child(7), #scoreboardTable th:nth-child(8), #scoreboardTable th:nth-child(9),
+        #scoreboardTable th:nth-child(10), #scoreboardTable th:nth-child(11), #scoreboardTable th:nth-child(12),
+        #scoreboardTable td:nth-child(4), #scoreboardTable td:nth-child(5), #scoreboardTable td:nth-child(6),
+        #scoreboardTable td:nth-child(7), #scoreboardTable td:nth-child(8), #scoreboardTable td:nth-child(9),
+        #scoreboardTable td:nth-child(10), #scoreboardTable td:nth-child(11), #scoreboardTable td:nth-child(12) {
+            width: 5%; /* Reduz a largura das colunas de 1 a 10 */
+        }
+        #scoreboardTable td:nth-child(13) {
+            width: 100%; /* Garante que a célula de total de pontos ocupe toda a largura restante */
+        }
+        /* Estilo específico para a tela Card Values */
+        .score-screen .card-value {
+            font-size: 1em; /* Fonte maior para o valor das cartas */
+        }
+        .score-screen .description {
+            margin-top: 20px;
+            font-size: 1em;
+            text-align: left;
+            padding: 0 10px; /* Adiciona padding lateral para melhor leitura */
+        }
+        .score-screen .game-controls {
+            display: flex;
+            flex-direction: column; /* Alinha os controles em coluna */
+            align-items: center; /* Centraliza os controles */
+        }
+        .score-screen .start-button {
+            margin-bottom: 10px; /* Adiciona margem inferior ao botão Shuffle */
+        }
+        .score-screen .master-card-label {
+            margin: 10px auto; /* Centraliza o rótulo da carta Master */
+            text-align: center;
+        }
+        .score-screen .master-card {
+            border: 1px solid #000;
+            padding: 2px;
+            margin: 10px auto; /* Centraliza a carta Master */
+            width: 40px; /* Reduz o tamanho da carta */
+            height: 40px; /* Reduz o tamanho da carta */
+            text-align: center;
+            background-color: #f0f0f0;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1em; /* Ajusta o tamanho da fonte */
+            line-height: 1; /* Ajusta o line-height */
+        }
+        .score-screen .master-card.red p {
+            color: red;
+        }
+        .score-screen .back-button {
+            margin-top: 10px; /* Adiciona margem superior ao botão Back */
+        }
+        /* Estilo específico para a tela Final Score */
+        .final-score-screen #finalScoreTable {
+            font-size: 2em; /* Aumenta o tamanho da fonte */
+        }
+        /* Classes para as cores de fundo das cartas */
+        .card.premium {
+            background-color: gold; /* Dourado para Premium */
+        }
+        .card.silver {
+            background-color: silver; /* Prateado para Silver */
+        }
+        .card.rest {
+            background-color: white; /* Branco para Rest */
+        }
+    </style>
+</head>
+<body>
+    <div class="start-screen active">
+        <h1 class="title">TROKER</h1>
+        <div class="game-controls">
+            <div>
+                <label for="numPlayers">PLAYERS:</label>
+                <select id="numPlayers" name="numPlayers">
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                </select>
+            </div>
+        </div>
+        <button onclick="startGame()">PLAY</button>
+        <button onclick="showScoreScreen()">RULES</button>
+    </div>
+
+    <div class="play-screen">
+        <h1 class="title">TROKER</h1>
+        <div class="round-counter" id="roundCounter">Round: 1</div>
+        <button onclick="showStartScreen()">BACK</button>
+        <button onclick="showScoreboardScreen()">Scoreboard</button>
+        <button onclick="showFinalScoreScreen()">Final Score</button>
+        <div id="playMasterCardContainer">
+            <!-- A carta Master será inserida aqui -->
+        </div>
+        <div class="container" id="playGameContainer">
+            <!-- As cartas do jogador humano serão inseridas aqui -->
+        </div>
+        <div class="container" id="robotCardsContainer">
+            <!-- As cartas dos jogadores robôs serão inseridas aqui -->
+        </div>
+        <table id="gameTable">
+            <thead>
+                <tr>
+                    <th>Players</th>
+                    <th>Show 1</th>
+                    <th>Show 2</th>
+                    <th>Show 3</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- As linhas dos jogadores serão inseridas aqui -->
+            </tbody>
+        </table>
+        <table id="pointsTable">
+            <thead>
+                <tr>
+                    <th>Players</th>
+                    <th>Show 1</th>
+                    <th>Show 2</th>
+                    <th>Show 3</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- As linhas dos pontos serão inseridas aqui -->
+            </tbody>
+        </table>
+        <button id="nextRoundButton" onclick="nextRound()">NEXT ROUND</button>
+        <button id="nextGameButton" onclick="resetGame()" style="display: none;">NEXT GAME</button>
+    </div>
+
+    <div class="score-screen">
+        <h1 class="title">TROKER</h1>
+        <h2 class="subtitle">RULES</h2>
+        <div class="game-controls">
+            <div class="start-button">
+                <button onclick="startGameAndStay()">Shuffle</button>
+            </div>
+            <div class="master-card-label">
+                <span>Master Card:</span>
+            </div>
+            <div id="masterCardContainer">
+                <!-- A carta Master será inserida aqui -->
+            </div>
+            <div class="back-button">
+                <button onclick="showStartScreen()">BACK</button>
+            </div>
+        </div>
+        <div class="container" id="gameContainer">
+            <!-- As cartas do jogador humano serão inseridas aqui -->
+        </div>
+        <div class="description">
+            <p>Clique no botão SHUFFLE, para gerar uma carta Master e distribuir três cartas para o jogador! Esta é apenas uma simulação para você aprender a avaliar o valor de uma carta com base na carta Master!</p>
+            <p>Você pode apertar o botão SHUFFLE quantas vezes quiser antes de começar a jogar para entender bem qual o valor das cartas!</p>
+            <h3>Regras de Pontuação:</h3>
+            <p>Os pontos básicos das cartas são estes abaixo. Eles serão somados a outros pontos gerados pela relação que as cartas da mão de cada jogador tem com a carta Master.</p>
+            <p><strong>Pontos Básicos:</strong></p>
+            <ul>
+                <li>Ás (A): 14 pontos</li>
+                <li>Rei (K): 13 pontos</li>
+                <li>Dama (Q): 12 pontos</li>
+                <li>Valete (J): 11 pontos</li>
+                <li>10: 10 pontos</li>
+                <li>9: 9 pontos</li>
+                <li>8: 8 pontos</li>
+                <li>7: 7 pontos</li>
+                <li>6: 6 pontos</li>
+                <li>5: 5 pontos</li>
+                <li>4: 4 pontos</li>
+                <li>3: 3 pontos</li>
+                <li>2: 2 pontos</li>
+            </ul>
+            <p>Com base na relação que as cartas tem com a carta Master, as cartas são classificadas nas seguintes categorias:</p>
+            <ul>
+                <li><strong>Premium:</strong> Se o valor da carta for igual ao valor da carta Master, a carta vale 100 pontos. Por exemplo, se a carta Master for um Ás de Copas (A♥) e você tiver um Ás de Ouros (A♦), a carta vale 100 pontos. Isto porque as cartas tem a mesma numeração, neste caso o Ás.</li>
+                <li><strong>Silver:</strong> Se o naipe da carta for igual ao naipe da carta Master, a carta vale 36 pontos mais o valor básico da carta. Por exemplo, se a carta Master for um Ás de Copas (A♥) e você tiver um Rei de Copas (K♥), a carta vale 36 + 13 = 49 pontos.</li>
+                <li><strong>Rest:</strong> Caso contrário, a carta vale 16 pontos mais o valor básico da carta. Por exemplo, se a carta Master for um Ás de Copas (A♥) e você tiver uma Dama de Paus (Q♠), a carta vale 16 + 12 = 28 pontos.</li>
+            </ul>
+            <h3>Dinâmica do Jogo:</h3>
+            <p>O jogo TROKER é dividido em várias telas, cada uma com uma função específica. Aqui está uma descrição simples de cada tela:</p>
+            <h4>Tela Inicial</h4>
+            <p>Na tela inicial, você pode escolher o número de jogadores (de 2 a 6) e iniciar o jogo clicando no botão "PLAY". Se quiser ver as regras de pontuação das cartas, clique em "RULES".</p>
+            <h4>Tela de Jogo</h4>
+            <p>Na tela de jogo, você verá suas cartas e a carta Master. O objetivo é selecionar suas cartas para obter a maior pontuação possível com base nas regras de pontuação. Assim que você selecionar uma carta, você poderá ver a carta dos outros jogadores e a pontuação de cada rodada. Você só verá as cartas do adversário após escolher as suas cartas.</p>
+            <p>A cada seleção de cartas o jogo vai destacar numa tabela com a cor verde a carta vencedora e logo abaixo os pontos obtidos por cada uma das três cartas quando forem reveladas.</p>
+            <h4>Tela de Placar (Scoreboard)</h4>
+            <p>A tela de placar mostra o desempenho de cada jogador em todas as rodadas. Você pode ver os pontos totais e os pontos obtidos em cada rodada, o que ajuda a acompanhar o progresso do jogo.</p>
+            <h3>Dicas e Estratégias:</h3>
+            <p>Aqui estão algumas dicas e estratégias para ajudar você a ter um melhor desempenho no jogo:</p>
+            <h4>Escolha de Cartas em Cada Show</h4>
+            <p>A escolha das cartas em cada Show é crucial para maximizar sua pontuação. Aqui estão algumas estratégias:</p>
+            <ul>
+                <li><strong>Primeira Show:</strong> Tente vencer a primeira Show, pois ela oferece a maior pontuação (3 pontos). Se você tiver uma carta Premium ou Silver, use-a na primeira Show.</li>
+                <li><strong>Segunda Show:</strong> Se você não tiver uma carta Premium ou Silver para usar na primeira Show, guarde-a maior carta que tiver para a segunda Show (2 pontos). Tentar ganhar dois pontos é melhor do que sacrificar uma boa carta na primeira Show, pois os jogadores tendem a revelar suas melhores cartas na primeira Show.</li>
+                <li><strong>Terceira Show:</strong> Se suas cartas não forem muito boas, guarde algumas cartas de valor intermediário para a terceiro Show (1 ponto). Mesmo que você não ganhe as primeiras Shows, ganhar a terceira Show pode garantir que você obtenha pelo menos um ponto na rodada, e um ponto ao final do jogo pode definir o vencedor!</li>
+            </ul>
+            <h4>Vantagem de Vencer as Primeiras Shows</h4>
+            <p>Vencer as primeiras Shows é vantajoso porque elas oferecem mais pontos. Tente sempre vencer a primeira Show, pois ela oferece 3 pontos. Se isso não for possível, foque na segunda Show, que oferece 2 pontos.</p>
+            <h4>Estratégia de Guardar Cartas</h4>
+            <p>Quando sua mão não for muito boa, considere guardar cartas para as segundas e terceiras Shows. Isso pode ajudar a garantir que você obtenha pelo menos um ou dois pontos na rodada, mesmo que não ganhe a primeira Show. Desta forma você se mantém vivo na competição.</p>
+            <p>O jogo tem dez rodadas e é perfeitamente possível se recuperar de um começo ruim e virar o jogo se você for um bom estrategista.</p>
+            <p>Divirta-se jogando TROKER, um jogo estratégico e inteligente!</p>
+            <p>Este jogo foi desenvolvido por Tio Ilmo Productions! Todos os direitos são reservados e é expressamente proibida a cópia ou reprodução de parte ou da totalidade deste produto!</p>
+        </div>
+    </div>
+
+    <div class="scoreboard-screen">
+        <h1 class="title">TROKER</h1>
+        <h2 class="subtitle">Scoreboard</h2>
+        <table id="scoreboardTable">
+            <thead>
+                <tr>
+                    <th>Players</th>
+                    <th>All</th>
+                    <th>Show</th>
+                    <th>1</th>
+                    <th>2</th>
+                    <th>3</th>
+                    <th>4</th>
+                    <th>5</th>
+                    <th>6</th>
+                    <th>7</th>
+                    <th>8</th>
+                    <th>9</th>
+                    <th>10</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- As linhas dos jogadores serão inseridas aqui -->
+            </tbody>
+        </table>
+        <button onclick="showPlayScreen()">BACK</button>
+    </div>
+
+    <div class="final-score-screen">
+        <h1 class="title">TROKER</h1>
+        <h2 class="subtitle">Final Score</h2>
+        <table id="finalScoreTable">
+            <thead>
+                <tr>
+                    <th>Player</th>
+                    <th>All</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- As linhas dos jogadores serão inseridas aqui -->
+            </tbody>
+        </table>
+        <button onclick="showPlayScreen()">BACK</button>
+    </div>
+
+    <script>
+        const suits = ['♠', '♥', '♦', '♣'];
+        const values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+        const playerNames = ["YOU", "ALEX", "BETH", "CARL", "DANA", "EVAN"];
+
+        let humanCards = [];
+        let robotCards = [];
+        let masterCard = null;
+        let selectedHumanCard = null;
+        let selectedHumanCard2 = null;
+        let selectedRobotCards = [];
+        let selectedRobotCards2 = [];
+        let show3Cards = false;
+        let currentRound = 1;
+        const totalRounds = 10;
+        let scoreboard = {};
+
+        function createDeck() {
+            let deck = [];
+            for (let suit of suits) {
+                for (let value of values) {
+                    deck.push({ suit, value });
+                }
+            }
+            return deck;
+        }
+
+        function shuffleDeck(deck) {
+            for (let i = deck.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [deck[i], deck[j]] = [deck[j], deck[i]];
+            }
+        }
+
+        function dealCards(deck, numPlayers) {
+            let players = [];
+            for (let i = 0; i < numPlayers; i++) {
+                let playerCards = [];
+                for (let j = 0; j < 3; j++) {
+                    playerCards.push(deck.pop());
+                }
+                players.push(playerCards);
+            }
+            return players;
+        }
+
+        function getCardValue(card, masterCard) {
+            const valueMap = {
+                '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, '10': 10,
+                'J': 11, 'Q': 12, 'K': 13, 'A': 14
+            };
+
+            if (card.value === masterCard.value) {
+                return 100; // Premium
+            } else if (card.suit === masterCard.suit) {
+                return 36 + valueMap[card.value]; // Silver
+            } else {
+                return 16 + valueMap[card.value]; // Rest
+            }
+        }
+
+        function assignCardValues(players, masterCard) {
+            players.forEach(playerCards => {
+                playerCards.forEach(card => {
+                    card.valuePoints = getCardValue(card, masterCard);
+                });
+            });
+        }
+
+        function calculatePlayerScores(players) {
+            return players.map(playerCards => {
+                const total = playerCards.reduce((sum, card) => sum + card.valuePoints, 0);
+                return total;
+            });
+        }
+
+        function displayMasterCard(masterCard, containerId) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            const masterCardDiv = document.createElement('div');
+            masterCardDiv.classList.add('master-card');
+            if (masterCard.suit === '♥' || masterCard.suit === '♦') {
+                masterCardDiv.classList.add('red');
+            }
+            masterCardDiv.innerHTML = `<p>${masterCard.value}<br>${masterCard.suit}</p>`;
+            container.appendChild(masterCardDiv);
+        }
+
+        function displayCards(players, numPlayers) {
+            const container = document.getElementById('gameContainer');
+            container.innerHTML = '';
+
+            const playerDiv = document.createElement('div');
+            playerDiv.classList.add('player');
+
+            const playerNameDiv = document.createElement('div');
+            playerNameDiv.classList.add('player-name');
+            playerNameDiv.innerHTML = `<h2>${playerNames[0]}</h2>`;
+
+            const cardColumns = document.createElement('div');
+            cardColumns.classList.add('card-columns');
+
+            players[0].forEach(card => {
+                const cardDiv = document.createElement('div');
+                cardDiv.classList.add('card');
+                if (card.suit === '♥' || card.suit === '♦') {
+                    cardDiv.classList.add('red');
+                }
+                cardDiv.innerHTML = `<p>${card.value}</p><p>${card.suit}</p>`;
+
+                // Aplica a classe CSS com base na relação da carta com a carta Master
+                if (card.value === masterCard.value) {
+                    cardDiv.classList.add('premium');
+                } else if (card.suit === masterCard.suit) {
+                    cardDiv.classList.add('silver');
+                } else {
+                    cardDiv.classList.add('rest');
+                }
+
+                // Adiciona o valor da carta fora da área da carta
+                const cardValueDiv = document.createElement('div');
+                cardValueDiv.classList.add('card-value');
+                cardValueDiv.innerHTML = `${card.valuePoints}`;
+                cardColumns.appendChild(cardDiv);
+                cardColumns.appendChild(cardValueDiv);
+            });
+
+            playerDiv.appendChild(playerNameDiv);
+            playerDiv.appendChild(cardColumns);
+            container.appendChild(playerDiv);
+        }
+
+        function displayHumanCards(humanCards, masterCard) {
+            const container = document.getElementById('playGameContainer');
+            container.innerHTML = '';
+
+            const playerDiv = document.createElement('div');
+            playerDiv.classList.add('player');
+
+            const playerNameDiv = document.createElement('div');
+            playerNameDiv.classList.add('player-name');
+            playerNameDiv.innerHTML = `<h2>YOU</h2>`;
+
+            const cardColumns = document.createElement('div');
+            cardColumns.classList.add('card-columns');
+
+            humanCards.forEach((card, index) => {
+                const cardDiv = document.createElement('div');
+                cardDiv.classList.add('card');
+                if (card.suit === '♥' || card.suit === '♦') {
+                    cardDiv.classList.add('red');
+                }
+                cardDiv.innerHTML = `<p>${card.value}</p><p>${card.suit}</p>`;
+
+                // Aplica a classe CSS com base na relação da carta com a carta Master
+                if (card.value === masterCard.value) {
+                    cardDiv.classList.add('premium');
+                } else if (card.suit === masterCard.suit) {
+                    cardDiv.classList.add('silver');
+                } else {
+                    cardDiv.classList.add('rest');
+                }
+
+                cardDiv.addEventListener('click', () => selectCard(index));
+                cardColumns.appendChild(cardDiv);
+            });
+
+            playerDiv.appendChild(playerNameDiv);
+            playerDiv.appendChild(cardColumns);
+            container.appendChild(playerDiv);
+
+            // Exibe a carta Master na tela de jogo
+            displayMasterCard(masterCard, 'playMasterCardContainer');
+
+            // Preenche a tabela com os dados dos jogadores e suas cartas
+            updateGameTable(humanCards, robotCards, selectedHumanCard, selectedHumanCard2);
+        }
+
+        function selectCard(index) {
+            if (!selectedHumanCard) {
+                // Primeira seleção
+                selectedHumanCard = humanCards[index];
+                humanCards.splice(index, 1); // Remove a carta selecionada
+                displayHumanCards(humanCards, masterCard); // Atualiza a exibição das cartas
+
+                // Exibe uma carta de cada jogador robô
+                selectRobotCards(true); // Primeira seleção dos robôs
+            } else if (!selectedHumanCard2) {
+                // Segunda seleção
+                selectedHumanCard2 = humanCards[index];
+                humanCards.splice(index, 1); // Remove a carta selecionada
+                displayHumanCards(humanCards, masterCard); // Atualiza a exibição das cartas
+                show3Cards = true; // Marca que a terceira carta deve ser mostrada
+
+                // Exibe a segunda carta de cada jogador robô
+                selectRobotCards(false); // Segunda seleção dos robôs
+            }
+
+            // Atualiza a tabela com a carta selecionada pelo humano
+            updateGameTable(humanCards, robotCards, selectedHumanCard, selectedHumanCard2);
+        }
+
+        function selectRobotCards(firstSelection) {
+            const numPlayers = document.getElementById('numPlayers').value;
+            robotCards.slice(1, numPlayers).forEach((playerCards, playerIndex) => {
+                if (firstSelection) {
+                    // Primeira seleção dos robôs
+                    const bestCard = getBestCard(playerCards, masterCard, selectedHumanCard);
+                    selectedRobotCards[playerIndex] = bestCard;
+                    playerCards.splice(playerCards.indexOf(bestCard), 1); // Remove a carta selecionada
+                } else {
+                    // Segunda seleção dos robôs
+                    const bestCard2 = getBestCard(playerCards, masterCard, selectedHumanCard2);
+                    selectedRobotCards2[playerIndex] = bestCard2;
+                    playerCards.splice(playerCards.indexOf(bestCard2), 1); // Remove a carta selecionada
+                }
+            });
+
+            // Atualiza a exibição das cartas dos robôs
+            displayRobotCards();
+        }
+
+        function displayRobotCards() {
+            const container = document.getElementById('robotCardsContainer');
+            container.innerHTML = '';
+
+            const numPlayers = document.getElementById('numPlayers').value;
+            robotCards.slice(1, numPlayers).forEach((playerCards, playerIndex) => {
+                const playerDiv = document.createElement('div');
+                playerDiv.classList.add('player');
+
+                const playerNameDiv = document.createElement('div');
+                playerNameDiv.classList.add('player-name');
+                playerNameDiv.innerHTML = `<h2>${playerNames[playerIndex + 1]}</h2>`;
+
+                const cardColumns = document.createElement('div');
+                cardColumns.classList.add('card-columns');
+
+                if (selectedRobotCards[playerIndex]) {
+                    const cardDiv = document.createElement('div');
+                    cardDiv.classList.add('card');
+                    if (selectedRobotCards[playerIndex].suit === '♥' || selectedRobotCards[playerIndex].suit === '♦') {
+                        cardDiv.classList.add('red');
+                    }
+                    cardDiv.innerHTML = `<p>${selectedRobotCards[playerIndex].value}</p><p>${selectedRobotCards[playerIndex].suit}</p>`;
+                    cardColumns.appendChild(cardDiv);
+                }
+
+                if (selectedRobotCards2[playerIndex]) {
+                    const cardDiv2 = document.createElement('div');
+                    cardDiv2.classList.add('card');
+                    if (selectedRobotCards2[playerIndex].suit === '♥' || selectedRobotCards2[playerIndex].suit === '♦') {
+                        cardDiv2.classList.add('red');
+                    }
+                    cardDiv2.innerHTML = `<p>${selectedRobotCards2[playerIndex].value}</p><p>${selectedRobotCards2[playerIndex].suit}</p>`;
+                    cardColumns.appendChild(cardDiv2);
+                }
+
+                playerDiv.appendChild(playerNameDiv);
+                playerDiv.appendChild(cardColumns);
+                container.appendChild(playerDiv);
+            });
+        }
+
+        function getBestCard(playerCards, masterCard, humanCard) {
+            // Escolhe a carta com o maior valor pontual que ainda seja maior que a carta do humano
+            let bestCard = playerCards[0];
+            playerCards.forEach(card => {
+                if (getCardValue(card, masterCard) > getCardValue(bestCard, masterCard) &&
+                    getCardValue(card, masterCard) > getCardValue(humanCard, masterCard)) {
+                    bestCard = card;
+                }
+            });
+
+            // Se nenhuma carta do robô é maior que a carta do humano, escolhe a carta com o menor valor pontual
+            if (getCardValue(bestCard, masterCard) <= getCardValue(humanCard, masterCard)) {
+                bestCard = playerCards[0];
+                playerCards.forEach(card => {
+                    if (getCardValue(card, masterCard) < getCardValue(bestCard, masterCard)) {
+                        bestCard = card;
+                    }
+                });
+            }
+
+            return bestCard;
+        }
+
+        function determineWinningCards(players, selectedHumanCard, selectedHumanCard2) {
+            let winningCards = { show1: [], show2: [], show3: [] };
+            let maxValueShow1 = 0;
+            let maxValueShow2 = 0;
+            let maxValueShow3 = 0;
+
+            // Determina as cartas vencedoras para Show 1
+            players.forEach((playerCards, index) => {
+                if (index === 0 && selectedHumanCard) {
+                    const value = getCardValue(selectedHumanCard, masterCard);
+                    if (value > maxValueShow1) {
+                        maxValueShow1 = value;
+                        winningCards.show1 = [selectedHumanCard];
+                    } else if (value === maxValueShow1) {
+                        winningCards.show1.push(selectedHumanCard);
+                    }
+                }
+                if (index > 0 && selectedRobotCards[index - 1]) {
+                    const value = getCardValue(selectedRobotCards[index - 1], masterCard);
+                    if (value > maxValueShow1) {
+                        maxValueShow1 = value;
+                        winningCards.show1 = [selectedRobotCards[index - 1]];
+                    } else if (value === maxValueShow1) {
+                        winningCards.show1.push(selectedRobotCards[index - 1]);
+                    }
+                }
+            });
+
+            // Determina as cartas vencedoras para Show 2
+            players.forEach((playerCards, index) => {
+                if (index === 0 && selectedHumanCard2) {
+                    const value = getCardValue(selectedHumanCard2, masterCard);
+                    if (value > maxValueShow2) {
+                        maxValueShow2 = value;
+                        winningCards.show2 = [selectedHumanCard2];
+                    } else if (value === maxValueShow2) {
+                        winningCards.show2.push(selectedHumanCard2);
+                    }
+                }
+                if (index > 0 && selectedRobotCards2[index - 1]) {
+                    const value = getCardValue(selectedRobotCards2[index - 1], masterCard);
+                    if (value > maxValueShow2) {
+                        maxValueShow2 = value;
+                        winningCards.show2 = [selectedRobotCards2[index - 1]];
+                    } else if (value === maxValueShow2) {
+                        winningCards.show2.push(selectedRobotCards2[index - 1]);
+                    }
+                }
+            });
+
+            // Determina as cartas vencedoras para Show 3
+            if (show3Cards) {
+                players.forEach((playerCards, index) => {
+                    if (index === 0 && humanCards.length > 0) {
+                        const value = getCardValue(humanCards[0], masterCard);
+                        if (value > maxValueShow3) {
+                            maxValueShow3 = value;
+                            winningCards.show3 = [humanCards[0]];
+                        } else if (value === maxValueShow3) {
+                            winningCards.show3.push(humanCards[0]);
+                        }
+                    }
+                    if (index > 0 && robotCards[index].length > 0) {
+                        const value = getCardValue(robotCards[index][0], masterCard);
+                        if (value > maxValueShow3) {
+                            maxValueShow3 = value;
+                            winningCards.show3 = [robotCards[index][0]];
+                        } else if (value === maxValueShow3) {
+                            winningCards.show3.push(robotCards[index][0]);
+                        }
+                    }
+                });
+            }
+
+            return winningCards;
+        }
+
+        function updateGameTable(humanCards, robotCards, selectedHumanCard, selectedHumanCard2) {
+            const tableBody = document.querySelector('#gameTable tbody');
+            tableBody.innerHTML = '';
+
+            const numPlayers = document.getElementById('numPlayers').value;
+            const players = [humanCards, ...robotCards.slice(1, numPlayers)];
+            const playerNames = ["YOU", "ALEX", "BETH", "CARL", "DANA", "EVAN"];
+
+            // Determinar as cartas vencedoras
+            const winningCards = determineWinningCards(players, selectedHumanCard, selectedHumanCard2);
+
+            players.forEach((playerCards, index) => {
+                const row = document.createElement('tr');
+
+                const playerNameCell = document.createElement('td');
+                playerNameCell.textContent = playerNames[index];
+                row.appendChild(playerNameCell);
+
+                const show1Cell = document.createElement('td');
+                if (index === 0 && selectedHumanCard) {
+                    show1Cell.textContent = `${selectedHumanCard.value} ${selectedHumanCard.suit}`;
+                    if (selectedHumanCard.suit === '♥' || selectedHumanCard.suit === '♦') {
+                        show1Cell.classList.add('red-suit');
+                    }
+                    if (winningCards.show1.includes(selectedHumanCard)) {
+                        show1Cell.classList.add('winning-cell');
+                    }
+                } else if (index > 0 && selectedRobotCards[index - 1]) {
+                    show1Cell.textContent = `${selectedRobotCards[index - 1].value} ${selectedRobotCards[index - 1].suit}`;
+                    if (selectedRobotCards[index - 1].suit === '♥' || selectedRobotCards[index - 1].suit === '♦') {
+                        show1Cell.classList.add('red-suit');
+                    }
+                    if (winningCards.show1.includes(selectedRobotCards[index - 1])) {
+                        show1Cell.classList.add('winning-cell');
+                    }
+                }
+                row.appendChild(show1Cell);
+
+                const show2Cell = document.createElement('td');
+                if (index === 0 && selectedHumanCard2) {
+                    show2Cell.textContent = `${selectedHumanCard2.value} ${selectedHumanCard2.suit}`;
+                    if (selectedHumanCard2.suit === '♥' || selectedHumanCard2.suit === '♦') {
+                        show2Cell.classList.add('red-suit');
+                    }
+                    if (winningCards.show2.includes(selectedHumanCard2)) {
+                        show2Cell.classList.add('winning-cell');
+                    }
+                } else if (index > 0 && selectedRobotCards2[index - 1]) {
+                    show2Cell.textContent = `${selectedRobotCards2[index - 1].value} ${selectedRobotCards2[index - 1].suit}`;
+                    if (selectedRobotCards2[index - 1].suit === '♥' || selectedRobotCards2[index - 1].suit === '♦') {
+                        show2Cell.classList.add('red-suit');
+                    }
+                    if (winningCards.show2.includes(selectedRobotCards2[index - 1])) {
+                        show2Cell.classList.add('winning-cell');
+                    }
+                }
+                row.appendChild(show2Cell);
+
+                const show3Cell = document.createElement('td');
+                if (show3Cards) {
+                    if (index === 0 && humanCards.length > 0) {
+                        show3Cell.textContent = `${humanCards[0].value} ${humanCards[0].suit}`;
+                        if (humanCards[0].suit === '♥' || humanCards[0].suit === '♦') {
+                            show3Cell.classList.add('red-suit');
+                        }
+                        if (winningCards.show3.includes(humanCards[0])) {
+                            show3Cell.classList.add('winning-cell');
+                        }
+                    } else if (index > 0 && robotCards[index].length > 0) {
+                        show3Cell.textContent = `${robotCards[index][0].value} ${robotCards[index][0].suit}`;
+                        if (robotCards[index][0].suit === '♥' || robotCards[index][0].suit === '♦') {
+                            show3Cell.classList.add('red-suit');
+                        }
+                        if (winningCards.show3.includes(robotCards[index][0])) {
+                            show3Cell.classList.add('winning-cell');
+                        }
+                    }
+                }
+                row.appendChild(show3Cell);
+
+                tableBody.appendChild(row);
+            });
+
+            // Identificar cartas vencedoras e seus jogadores
+            const winningPlayers = identifyWinningCards();
+
+            // Atualiza a tabela de pontos
+            updatePointsTable(winningPlayers);
+
+            // Atualiza o objeto scoreboard
+            updateScoreboardData();
+
+            // Atualiza a tabela Scoreboard
+            updateScoreboardTable();
+
+            // Atualiza a tabela Final Score
+            updateFinalScoreTable();
+        }
+
+        function identifyWinningCards() {
+            const tableBody = document.querySelector('#gameTable tbody');
+            const rows = tableBody.querySelectorAll('tr');
+            const winningCards = { show1: [], show2: [], show3: [] };
+
+            rows.forEach(row => {
+                const playerName = row.querySelector('td').textContent;
+                const showCells = row.querySelectorAll('td:not(:first-child)');
+
+                showCells.forEach((cell, index) => {
+                    if (cell.classList.contains('winning-cell')) {
+                        if (index === 0) {
+                            winningCards.show1.push(playerName);
+                        } else if (index === 1) {
+                            winningCards.show2.push(playerName);
+                        } else if (index === 2) {
+                            winningCards.show3.push(playerName);
+                        }
+                    }
+                });
+            });
+
+            console.log('Winning Cards:', winningCards);
+            return winningCards;
+        }
+
+        function updatePointsTable(winningPlayers) {
+            const tableBody = document.querySelector('#pointsTable tbody');
+            tableBody.innerHTML = '';
+
+            const numPlayers = document.getElementById('numPlayers').value;
+            for (let i = 0; i < numPlayers; i++) {
+                const row = document.createElement('tr');
+
+                const playerNameCell = document.createElement('td');
+                playerNameCell.textContent = playerNames[i];
+                row.appendChild(playerNameCell);
+
+                const show1Cell = document.createElement('td');
+                if (winningPlayers.show1.includes(playerNames[i])) {
+                    show1Cell.textContent = '3';
+                } else {
+                    show1Cell.textContent = '0';
+                }
+                row.appendChild(show1Cell);
+
+                const show2Cell = document.createElement('td');
+                if (winningPlayers.show2.includes(playerNames[i])) {
+                    show2Cell.textContent = '2';
+                } else {
+                    show2Cell.textContent = '0';
+                }
+                row.appendChild(show2Cell);
+
+                const show3Cell = document.createElement('td');
+                if (winningPlayers.show3.includes(playerNames[i])) {
+                    show3Cell.textContent = '1';
+                } else {
+                    show3Cell.textContent = '0';
+                }
+                row.appendChild(show3Cell);
+
+                tableBody.appendChild(row);
+            }
+        }
+
+        function updateScoreboardData() {
+            const numPlayers = document.getElementById('numPlayers').value;
+            const pointsTableBody = document.querySelector('#pointsTable tbody');
+            const pointsRows = pointsTableBody.querySelectorAll('tr');
+
+            pointsRows.forEach((row, index) => {
+                const playerName = row.querySelector('td').textContent;
+                const show1Points = parseInt(row.querySelector('td:nth-child(2)').textContent);
+                const show2Points = parseInt(row.querySelector('td:nth-child(3)').textContent);
+                const show3Points = parseInt(row.querySelector('td:nth-child(4)').textContent);
+
+                if (!scoreboard[playerName]) {
+                    scoreboard[playerName] = {
+                        show1_round1: 0, show1_round2: 0, show1_round3: 0, show1_round4: 0, show1_round5: 0,
+                        show1_round6: 0, show1_round7: 0, show1_round8: 0, show1_round9: 0, show1_round10: 0,
+                        show2_round1: 0, show2_round2: 0, show2_round3: 0, show2_round4: 0, show2_round5: 0,
+                        show2_round6: 0, show2_round7: 0, show2_round8: 0, show2_round9: 0, show2_round10: 0,
+                        show3_round1: 0, show3_round2: 0, show3_round3: 0, show3_round4: 0, show3_round5: 0,
+                        show3_round6: 0, show3_round7: 0, show3_round8: 0, show3_round9: 0, show3_round10: 0,
+                        total: 0
+                    };
+                }
+
+                scoreboard[playerName][`show1_round${currentRound}`] = show1Points;
+                scoreboard[playerName][`show2_round${currentRound}`] = show2Points;
+                scoreboard[playerName][`show3_round${currentRound}`] = show3Points;
+
+                // Atualiza o total de pontos
+                scoreboard[playerName].total += show1Points + show2Points + show3Points;
+            });
+        }
+
+        function updateScoreboardTable() {
+            const tableBody = document.querySelector('#scoreboardTable tbody');
+            tableBody.innerHTML = '';
+
+            const numPlayers = document.getElementById('numPlayers').value;
+            for (let i = 0; i < numPlayers; i++) {
+                // Cria uma linha para o nome do jogador e Show 1
+                const nameRow = document.createElement('tr');
+                const playerNameCell = document.createElement('td');
+                playerNameCell.textContent = playerNames[i];
+                playerNameCell.setAttribute('rowspan', '3'); // O nome do jogador ocupa 3 linhas
+                nameRow.appendChild(playerNameCell);
+
+                const allCell = document.createElement('td');
+                allCell.textContent = calculateTotalPoints(playerNames[i]);
+                allCell.setAttribute('rowspan', '3'); // O total de pontos ocupa 3 linhas
+                nameRow.appendChild(allCell);
+
+                const showCell = document.createElement('td');
+                showCell.textContent = 'Show 1';
+                nameRow.appendChild(showCell);
+
+                for (let j = 1; j <= 10; j++) {
+                    const scoreCell = document.createElement('td');
+                    scoreCell.textContent = scoreboard[playerNames[i]] ? scoreboard[playerNames[i]][`show1_round${j}`] || 0 : 0;
+                    nameRow.appendChild(scoreCell);
+                }
+
+                tableBody.appendChild(nameRow);
+
+                // Cria uma linha para Show 2
+                const show2Row = document.createElement('tr');
+                const show2Cell = document.createElement('td');
+                show2Cell.textContent = 'Show 2';
+                show2Row.appendChild(show2Cell);
+
+                for (let j = 1; j <= 10; j++) {
+                    const scoreCell2 = document.createElement('td');
+                    scoreCell2.textContent = scoreboard[playerNames[i]] ? scoreboard[playerNames[i]][`show2_round${j}`] || 0 : 0;
+                    show2Row.appendChild(scoreCell2);
+                }
+
+                tableBody.appendChild(show2Row);
+
+                // Cria uma linha para Show 3
+                const show3Row = document.createElement('tr');
+                const show3Cell = document.createElement('td');
+                show3Cell.textContent = 'Show 3';
+                show3Row.appendChild(show3Cell);
+
+                for (let j = 1; j <= 10; j++) {
+                    const scoreCell3 = document.createElement('td');
+                    scoreCell3.textContent = scoreboard[playerNames[i]] ? scoreboard[playerNames[i]][`show3_round${j}`] || 0 : 0;
+                    show3Row.appendChild(scoreCell3);
+                }
+
+                tableBody.appendChild(show3Row);
+            }
+        }
+
+        function updateFinalScoreTable() {
+            const tableBody = document.querySelector('#finalScoreTable tbody');
+            tableBody.innerHTML = '';
+
+            const numPlayers = document.getElementById('numPlayers').value;
+            for (let i = 0; i < numPlayers; i++) {
+                const row = document.createElement('tr');
+
+                const playerNameCell = document.createElement('td');
+                playerNameCell.textContent = playerNames[i];
+                row.appendChild(playerNameCell);
+
+                const allCell = document.createElement('td');
+                allCell.textContent = calculateTotalPoints(playerNames[i]);
+                row.appendChild(allCell);
+
+                tableBody.appendChild(row);
+            }
+        }
+
+        function calculateTotalPoints(playerName) {
+            let totalPoints = 0;
+            for (let j = 1; j <= 10; j++) {
+                totalPoints += scoreboard[playerName][`show1_round${j}`] || 0;
+                totalPoints += scoreboard[playerName][`show2_round${j}`] || 0;
+                totalPoints += scoreboard[playerName][`show3_round${j}`] || 0;
+            }
+            return totalPoints;
+        }
+
+        function startGame() {
+            const numPlayers = document.getElementById('numPlayers').value;
+            const deck = createDeck();
+            shuffleDeck(deck);
+
+            // Sorteia a carta Master
+            const masterCardIndex = Math.floor(Math.random() * deck.length);
+            masterCard = deck[masterCardIndex];
+
+            // Remove a carta Master do baralho
+            deck.splice(masterCardIndex, 1);
+
+            // Distribui as cartas para os jogadores
+            const players = dealCards(deck, numPlayers);
+
+            // Atribui valores às cartas com base na carta Master
+            assignCardValues(players, masterCard);
+
+            // Exibe a carta Master
+            displayMasterCard(masterCard, 'masterCardContainer');
+
+            // Exibe as cartas dos jogadores
+            displayCards(players, numPlayers);
+
+            // Armazena as cartas do jogador humano e dos jogadores robôs para exibição na tela de jogo
+            humanCards = players[0];
+            robotCards = players;
+            selectedRobotCards = [];
+            selectedRobotCards2 = [];
+            show3Cards = false;
+
+            // Exibe as cartas do jogador humano na tela de jogo
+            displayHumanCards(humanCards, masterCard);
+
+            // Atualiza o contador de rodadas
+            document.getElementById('roundCounter').textContent = `Round: ${currentRound}`;
+
+            // Mostra a tela de jogo
+            showPlayScreen();
+        }
+
+        function startGameAndStay() {
+            startGame();
+            showScoreScreen();
+        }
+
+        function showStartScreen() {
+            document.querySelector('.start-screen').classList.add('active');
+            document.querySelector('.play-screen').classList.remove('active');
+            document.querySelector('.score-screen').classList.remove('active');
+            document.querySelector('.scoreboard-screen').classList.remove('active');
+            document.querySelector('.final-score-screen').classList.remove('active');
+        }
+
+        function showPlayScreen() {
+            document.querySelector('.start-screen').classList.remove('active');
+            document.querySelector('.play-screen').classList.add('active');
+            document.querySelector('.score-screen').classList.remove('active');
+            document.querySelector('.scoreboard-screen').classList.remove('active');
+            document.querySelector('.final-score-screen').classList.remove('active');
+        }
+
+        function showScoreScreen() {
+            document.querySelector('.start-screen').classList.remove('active');
+            document.querySelector('.play-screen').classList.remove('active');
+            document.querySelector('.score-screen').classList.add('active');
+            document.querySelector('.scoreboard-screen').classList.remove('active');
+            document.querySelector('.final-score-screen').classList.remove('active');
+        }
+
+        function showScoreboardScreen() {
+            document.querySelector('.start-screen').classList.remove('active');
+            document.querySelector('.play-screen').classList.remove('active');
+            document.querySelector('.score-screen').classList.remove('active');
+            document.querySelector('.scoreboard-screen').classList.add('active');
+            document.querySelector('.final-score-screen').classList.remove('active');
+
+            // Atualiza a tabela Scoreboard
+            updateScoreboardTable();
+        }
+
+        function showFinalScoreScreen() {
+            document.querySelector('.start-screen').classList.remove('active');
+            document.querySelector('.play-screen').classList.remove('active');
+            document.querySelector('.score-screen').classList.remove('active');
+            document.querySelector('.scoreboard-screen').classList.remove('active');
+            document.querySelector('.final-score-screen').classList.add('active');
+
+            // Atualiza a tabela Final Score
+            updateFinalScoreTable();
+        }
+
+        function nextRound() {
+            if (currentRound < totalRounds) {
+                currentRound++;
+                document.getElementById('roundCounter').textContent = `Round: ${currentRound}`;
+
+                // Limpa a tabela Show
+                const tableBody = document.querySelector('#gameTable tbody');
+                tableBody.innerHTML = '';
+
+                // Limpa as cartas do jogador humano
+                humanCards = [];
+                selectedHumanCard = null;
+                selectedHumanCard2 = null;
+                selectedRobotCards = [];
+                selectedRobotCards2 = [];
+                show3Cards = false;
+
+                // Limpa as cartas dos robôs na tela de jogo
+                document.getElementById('robotCardsContainer').innerHTML = '';
+
+                // Reinicia as cartas e a lógica para a próxima rodada
+                startGame();
+
+                // Exibe automaticamente uma nova carta Master
+                showHumanCards();
+            } else {
+                // Desabilita o botão NEXT ROUND e exibe o botão NEXT GAME
+                document.getElementById('nextRoundButton').disabled = true;
+                document.getElementById('nextGameButton').style.display = 'inline-block';
+            }
+        }
+
+        // Adicione um ouvinte de evento para o elemento de seleção de jogadores
+        document.getElementById('numPlayers').addEventListener('change', resetGame);
+
+        function resetGame() {
+            // Limpa as cartas do jogador humano e dos robôs
+            humanCards = [];
+            robotCards = [];
+            masterCard = null;
+            selectedHumanCard = null;
+            selectedHumanCard2 = null;
+            selectedRobotCards = [];
+            selectedRobotCards2 = [];
+            show3Cards = false;
+
+            // Limpa os contêineres de cartas
+            document.getElementById('playGameContainer').innerHTML = '';
+            document.getElementById('robotCardsContainer').innerHTML = '';
+            document.getElementById('playMasterCardContainer').innerHTML = '';
+            document.getElementById('masterCardContainer').innerHTML = '';
+            document.getElementById('gameContainer').innerHTML = '';
+
+            // Limpa a tabela de jogadores
+            const tableBody = document.querySelector('#gameTable tbody');
+            tableBody.innerHTML = '';
+
+            // Reseta o contador de rodadas
+            currentRound = 1;
+            document.getElementById('roundCounter').textContent = `Round: ${currentRound}`;
+
+            // Mostra a tela inicial
+            showStartScreen();
+
+            // Habilita o botão NEXT ROUND e esconde o botão NEXT GAME
+            document.getElementById('nextRoundButton').disabled = false;
+            document.getElementById('nextGameButton').style.display = 'none';
+
+            // Reseta o scoreboard
+            scoreboard = {};
+        }
+    </script>
+</body>
+</html>
